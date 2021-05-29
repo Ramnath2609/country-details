@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import axios from "axios";
+import apiUrl from "../environment/apiKey"
 
 const useStyles = makeStyles({
   table: {
@@ -23,7 +24,7 @@ export default function BasicTable(props) {
   const [conversionRate, setConversionRate] = useState({})
 
   useEffect(() => {
-    axios.get(`http://data.fixer.io/api/latest?access_key=c7a63a10d155a90219369c106dec43bd&symbols=${props.currencies.map(ele => ele.code).join(",")}`)
+    axios.get(`${apiUrl.currencyApiUrl}${apiUrl.currencyApiAccessKey}&symbols=${props.currencies.map(ele => ele.code).join(",")}`)
     .then(response => {
         setConversionRate(response.data.rates)
     })
@@ -36,7 +37,6 @@ export default function BasicTable(props) {
           <TableRow>
             <TableCell><b>S.no</b></TableCell>
             <TableCell align="center"><b>Code</b></TableCell>
-            <TableCell align="center"><b>Currency</b></TableCell>
             <TableCell align="center"><b>Name</b></TableCell>
             <TableCell align="right"><b>Conversion rate (In EUR)</b></TableCell>
           </TableRow>
@@ -48,7 +48,6 @@ export default function BasicTable(props) {
                 {i+1}
               </TableCell>
               <TableCell align="center">{curr.code}</TableCell>
-              <TableCell align="center">{curr.name}</TableCell>
               <TableCell align="center">{curr.name}</TableCell>
               <TableCell align="center">{conversionRate[curr.code]}</TableCell>
             </TableRow>

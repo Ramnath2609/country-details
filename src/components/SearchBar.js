@@ -7,6 +7,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from "axios";
 import Alert from '@material-ui/lab/Alert';
 import ResultAccordion from "./ResultAccordian";
+import apiUrl from "../environment/apiKey"
 
 
 const useStyles = makeStyles((theme) => ({
@@ -48,6 +49,7 @@ export default function BasicTextFields() {
   };
 
   const handleToggle = (e) => {
+    console.log(apiUrl)
     if(e){
         e.preventDefault();
     }
@@ -58,7 +60,7 @@ export default function BasicTextFields() {
         setCountries([])
     }else{
         setOpen(!open);
-        axios.get(`https://restcountries.eu/rest/v2/name/${inputValue}`)
+        axios.get(`${apiUrl.countryApi}${inputValue}`)
         .then(response => {
             console.log(response.status)
             setCountries(response.data)
@@ -83,6 +85,9 @@ export default function BasicTextFields() {
                 setInputValue(e.target.value)
                 if(showAlert){
                     setShowAlert(false)
+                }
+                if(countries.length > 0){
+                    setCountries([])
                 }
                 }} />
             <Button className={classes.button} variant="contained" color="primary" onClick={handleToggle}>
