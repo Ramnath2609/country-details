@@ -2,3 +2,8 @@
     text-align: center;
     margin-top: 5%;
 }
+
+.currencyTable {
+    width: 90%;
+    margin: 10px auto;
+}

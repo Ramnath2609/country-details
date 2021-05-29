@@ -6,16 +6,10 @@ import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from "axios";
 import Alert from '@material-ui/lab/Alert';
+import ResultAccordion from "./ResultAccordian";
 
 
 const useStyles = makeStyles((theme) => ({
-//   root: {
-//     '& > *': {
-//       margin: theme.spacing(1),
-//       width: '50ch',
-//       height: '7ch'
-//     }
-//   },
   button: {
       margin: theme.spacing(1),
       width: '25ch',
@@ -31,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   formInput: {
     margin: theme.spacing(1),
     width: '50ch',
-    height: '7ch'
+    height: '7ch',
   }, 
   alertMessage: {
     marginTop: theme.spacing(1), 
@@ -47,25 +41,35 @@ export default function BasicTextFields() {
   const [ countries, setCountries ] = useState([])
   const [ alertMessage, setAlertMessage ] = useState("")
   const [showAlert, setShowAlert] = useState(false)
+  const [severity, setSeverity] = useState("error")
   
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleToggle = () => {
+  const handleToggle = (e) => {
+    if(e){
+        e.preventDefault();
+    }
     if(inputValue.length == 0){
         setShowAlert(true)
+        setSeverity("error")
         setAlertMessage("Country name should not be empty")
+        setCountries([])
     }else{
         setOpen(!open);
         axios.get(`https://restcountries.eu/rest/v2/name/${inputValue}`)
         .then(response => {
             console.log(response.status)
             setCountries(response.data)
+            setSeverity("success")
+            setAlertMessage(`${response.data.length} results found`)
+            setShowAlert(true)
             handleClose()
         })
         .catch(err => {
             handleClose()
+            setSeverity("error")
             setAlertMessage("Please enter a valid country name")
             setShowAlert(true)
         })
@@ -74,7 +78,7 @@ export default function BasicTextFields() {
 
   return (
       <div className="searchField">
-        <form className={classes.root} noValidate autoComplete="off">
+        <form className={classes.root} noValidate autoComplete="off" onSubmit={(e) => {handleToggle(e)}}>
             <TextField className={classes.formInput} id="outlined-basic" label="Country" variant="outlined" value={inputValue} onChange={(e) =>{
                 setInputValue(e.target.value)
                 if(showAlert){
@@ -84,13 +88,20 @@ export default function BasicTextFields() {
             <Button className={classes.button} variant="contained" color="primary" onClick={handleToggle}>
                 Search
             </Button>
+        </form>
             {showAlert && 
-                <Alert className={classes.alertMessage} severity="info">{alertMessage}</Alert>
+                <Alert className={classes.alertMessage} severity={severity}>{alertMessage}</Alert>
             }
+            <div className="results">
+                {
+                countries.map(ele => {
+                    return <ResultAccordion fullName={ele.name} population={ele.population} currencies={ele.currencies} />
+                })
+                }
+            </div>
             <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
                 <CircularProgress color="inherit" />
             </Backdrop>
-        </form>
       </div>
   );
 }
